@@ -1,0 +1,97 @@
+## Mastering Linux Storage USing LVM2
+# Andrew Mallet
+# @theurbanpenguin - www.theurbanpenguin.com
+
+# Linux Storage Management with LVM
+* Managing Logical Volumes
+
+- Understanding LVM
+- Configuring the LVM system
+- Using Ansible configuration management
+- Configuring storage layers
+- Managing volume groups and volumes
+- LVM thin-provisioning
+- Snapshotting logical volumes
+- Migrating to new hardware
+- Creating special purpose volumes
+
+* Lab System
+
+- You can use Ubuntu 18.04 for the demonstrations but any recent Linux
+  distribution will suffice, labs will require root access
+- It's possible to use AWS or other cloud based systems
+- A single system is enough for this course but you could use three 
+  systems to highlight the advantages of using Ansible as a 
+  configuration management system.
+
+* Logical Volume Management (LVM)
+- Aggregating block storage to re-allocate as needed in the form of
+  device-mapper volumes.
+
+$ lsblk #List block devices
+$ sudo dmsetup ls --tree #List device-mapper devices
+
+# Installing the LVM Package
+- LVM may already be installed depending on how the disks were setup
+on your system.  If it is not installed we can add the package.
+
+$ sudo lvm version || sudo apt install -y lvm2 # Install lvm2 if not installed
+
+* Demo - Checking the existing system
+- List block devices
+- List device-mapper devices
+- These commands help us better understand the system we have
+  Testing for the version of LVM is a sure fire way to
+  to determine if it is installed.
+
+# Understanding the Layered Storage Model of LVM2
+* LVM Layers
+* Layered storage in LVM
+- Physical
+- Volume Groups
+- Logical Volumes
+  Using the command line to discover the layers you
+  have in-place on your system.
+
+* LVM Storage Layers
+
+- Logical Volumes - Dev-mapper devices which are formatted and 
+  	presented to the consumer as a block device.
+
+- Volume Groups - Volume Groups acts as storage pools, aggregating
+  	storage together and overcoming the limitations of 
+  	physical storage size.
+
+- Physical Volumes - Physical storage existing on the host as disks,
+	partitions and raw files.
+
+* Managing LVM
+
+- Physical Volumes - pvs, pvmove & pvcreate
+- Volume Groups - vgscreate, vgs & vgdisplay
+- Logical Volumes - lvs, lvcreate & lvresize
+
+$ hostnamectl # shows the OS you are running
+$ pvs # Lists our physical volumes
+# Output TBC
+
+$ fallocate -l 500m /tmp/file1 # This will create a raw disc file
+$ ls -larth /tmp/file1 # listing the raw disc file
+-rw-r--r-- 1 root root 500M Nov 25 10:50 /tmp/file1
+
+* Now create a loopback device
+$ losetup -l
+# Output TBC
+
+$ losetup -f
+/dev/loop0
+
+$ losetup -f /tmp/file1
+$ losetup -l
+NAME	   SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE  DIO LOG-SEC
+/dev/loop0	   0	  0	    0  0 /tmp/file1   0     512
+
+$ pvcreate /dev/loop0
+ Physical volume "/dev/loop0" successfully created.
+
+
